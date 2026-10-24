@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BP Survival</title>
+
+<!-- All styles live in css/style.css (IDs and class names are unchanged) -->
+<link rel="stylesheet" href="css/style.css">
+
+<!-- Import map: maps the bare name "three" to the local, vendored copy of
+     Three.js. Relative path = works on GitHub Pages AND locally. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./js/vendor/three.module.js"
+  }
+}
+</script>
+</head>
+
+<body>
+<div id="menuFX">
+  <canvas id="menuCanvas"></canvas>
+  <div class="fx-noise"></div>
+</div>
+
+<section id="splash" class="screen">
+  <div class="splash-content">
+    <div class="kicker">BLACK PINE INTERACTIVE PRESENTS</div>
+    <h1 class="logo">BP<span>SURVIVAL</span></h1>
+    <p class="splash-sub">
+      Repair the generators. Outlast the thing hunting you.
+      Every environment is procedurally rebuilt when the run begins.
+    </p>
+    <button id="startBtn" class="primary-button">Start Experience</button>
+    <div class="splash-foot">HEADPHONES RECOMMENDED · PROTOTYPE BUILD 0.1</div>
+  </div>
+</section>
+
+<section id="mainMenu" class="screen hidden">
+  <div class="menu-shell">
+    <header class="menu-topbar">
+      <div class="mini-logo">BP <span>SURVIVAL</span></div>
+      <div class="menu-status"><span class="status-dot"></span>LOCAL BUILD / SYSTEMS NOMINAL</div>
+    </header>
+
+    <div class="menu-grid">
+      <aside class="side-nav">
+        <div class="nav-label">MAIN TERMINAL</div>
+        <button class="nav-item active" data-panel="home">
+          OVERVIEW
+          <small>Return to command center</small>
+        </button>
+        <button class="nav-item" data-coming="Story Mode">
+          STORY MODE
+          <small>Campaign experience</small>
+        </button>
+        <button class="nav-item" data-coming="Online Mode">
+          ONLINE MODE
+          <small>Co-op and versus</small>
+        </button>
+        <button class="nav-item" data-panel="freeplay">
+          FREE PLAY
+          <small>Build a custom run</small>
+        </button>
+
+        <div class="side-footer">
+          BP SURVIVAL<br>
+          A procedural horror prototype.<br>
+          Nothing stays the same twice.
+        </div>
+      </aside>
+
+      <main class="menu-content">
+        <section id="homePanel" class="menu-panel">
+          <div class="home-layout">
+            <div class="home-copy">
+              <div class="eyebrow">ASYMMETRIC HORROR / PROTOTYPE</div>
+              <h2>NO ONE GETS OUT<br><em>ALONE.</em></h2>
+              <p>
+                You have one objective: repair enough generators to power the exit.
+                Choose your environment, choose your hunter and survive the procedure.
+              </p>
+
+              <div class="mode-stack">
+                <button class="mode-card" data-mode="freeplay">
+                  <span>
+                    <strong>FREE PLAY</strong>
+                    <small>Procedural maps and custom killer runs</small>
+                  </span>
+                  <span class="arrow">→</span>
+                </button>
+
+                <button class="mode-card soon" data-mode="story">
+                  <span>
+                    <strong>STORY MODE</strong>
+                    <small>Discover what happened at Black Pine</small>
+                  </span>
+                  <span class="tag">COMING SOON</span>
+                  <span class="arrow">→</span>
+                </button>
+
+                <button class="mode-card soon" data-mode="online">
+                  <span>
+                    <strong>ONLINE MODE</strong>
+                    <small>Hunt together. Die together.</small>
+                  </span>
+                  <span class="tag">COMING SOON</span>
+                  <span class="arrow">→</span>
+                </button>
+              </div>
+            </div>
+
+            <aside class="feature-panel">
+              <div class="eyebrow">CURRENTLY SELECTED</div>
+              <h3 id="homeMapName">Hollowpoint Facility</h3>
+              <p id="homeMapDetail">
+                Procedural concrete halls, emergency lamps and abandoned medical equipment.
+              </p>
+              <div class="feature-map"></div>
+              <div class="map-meta">
+                <span>MODE <b>FREE PLAY</b></span>
+                <span>STATUS <b>READY</b></span>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="freeplayPanel" class="menu-panel hidden">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">FREE PLAY / CUSTOM RUN</div>
+              <h2>Choose Your Environment</h2>
+              <p>Every run generates new routes, props, lighting and hazards.</p>
+            </div>
+            <button id="backHome" class="back-button">← BACK</button>
+          </div>
+
+          <div id="mapCards" class="map-grid"></div>
+
+          <div class="selection-layout">
+            <div class="selection-box">
+              <h3 id="selectionName">Hollowpoint Facility</h3>
+              <p id="selectionDetail">Select an environment to begin.</p>
+            </div>
+
+            <div class="selection-box">
+              <h3>Choose Your Hunter</h3>
+              <div id="killerCards" class="killer-list"></div>
+              <button id="deployBtn" class="deploy-button" disabled>
+                Deploy
+                <span>Select a map and hunter</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+</section>
+
+<div id="comingSoon" class="modal-layer hidden">
+  <div class="modal">
+    <div class="eyebrow">SYSTEM LOCKED</div>
+    <h2 id="comingTitle">Coming Soon</h2>
+    <p id="comingText">
+      This mode is planned for a future build.
+    </p>
+    <button id="closeComing">Return</button>
+  </div>
+</div>
+
+<div id="transition" class="hidden"></div>
+
+<div id="hud" class="hidden">
+  <div id="vig"></div>
+  <div id="hitflash"></div>
+
+  <div id="tl">
+    <div id="gens"></div>
+    <div id="mapHud"></div>
+    <div id="obj">Repair generators, then escape through the exit.</div>
+    <div id="kname"></div>
+  </div>
+
+  <div id="tr">
+    <div id="view"></div>
+    <div id="flashTxt"></div>
+  </div>
+
+  <div id="bl">
+    <div id="health"></div>
+    <div class="lbl">STAMINA</div>
+    <div class="bar"><div id="stam"></div></div>
+    <div class="lbl">FLASHLIGHT</div>
+    <div class="bar"><div id="batt"></div></div>
+  </div>
+
+  <div id="cross"></div>
+  <div id="prompt"></div>
+  <div id="repair" class="hidden"><div id="repairFill"></div></div>
+  <div id="skill" class="hidden">
+    <div id="skillZone"></div>
+    <div id="skillNeedle"></div>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<div id="pause" class="overlay hidden">
+  <h1 style="font-size:40px">PAUSED</h1>
+  <div class="sub">Click to resume</div>
+  <button id="quitBtn">Quit to menu</button>
+</div>
+
+<div id="end" class="overlay hidden">
+  <h1 id="endTitle"></h1>
+  <div class="sub" id="endStats"></div>
+  <button id="againBtn">Back to menu</button>
+</div>
+
+<!-- The game boots from js/main.js (an ES module, so the page must be
+     served over http(s) -- see README.md "Run it locally") -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
